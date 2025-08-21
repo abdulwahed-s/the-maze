@@ -1,5 +1,4 @@
 
-
 import os
 import time
 import json
@@ -12,19 +11,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 import uvicorn
-
-
 HOST = "0.0.0.0"
 PORT = 8001
 DATABASE_FILE = "leaderboard.db"
-
-
 def init_database():
     """Initialize SQLite database for leaderboard"""
     conn = sqlite3.connect(DATABASE_FILE)
     cursor = conn.cursor()
-    
-
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS scores (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,8 +26,6 @@ def init_database():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-    
-
     cursor.execute('''
         CREATE INDEX IF NOT EXISTS idx_name_time ON scores (name, time)
     ''')
@@ -42,16 +33,10 @@ def init_database():
     conn.commit()
     conn.close()
     print("✅ Database initialized successfully")
-
-
 init_database()
-
-
 class ScoreIn(BaseModel):
     name: str = Field(min_length=1, max_length=64)
     time: float = Field(ge=0.0, lt=36000)
-
-
 app = FastAPI(title="Maze Runner Game", version="1.0.0")
 
 app.add_middleware(
@@ -61,7 +46,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -73,7 +57,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         /* Embedded CSS */
         * { box-sizing: border-box; }
         html, body { height: 100%; margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #0b1020; color: #e9eef7; }
-
+        #app { min-height: 100%; width: 100%; padding: 0; }
         .hidden { display: none !important; }
 
         .screen { 
@@ -91,14 +75,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         
         /* Disable animations on mobile for leaderboard to prevent positioning issues */
         @media (max-width: 768px) {
-
+            #leaderboard-screen.active {
                 transform: none !important;
                 transition: none !important;
                 animation: none !important;
             }
             
             /* Also disable base screen animations for leaderboard on mobile */
-
+            #leaderboard-screen {
                 transform: none !important;
                 transition: none !important;
                 animation: none !important;
@@ -119,12 +103,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         
         /* Ensure interactive elements are clickable on mobile */
         @media (max-width: 768px) {
-
+            #home-screen.active, #game-screen.active {
                 z-index: 200 !important;
                 position: relative !important;
             }
             
-
+            #home-screen.active .card, #game-screen.active .card {
                 z-index: 201 !important;
             }
             
@@ -230,7 +214,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             100% { transform: rotate(360deg); }
         }
 
-
+        #game-screen { width: 100%; }
         .hud { 
             display: flex; 
             justify-content: space-between; 
@@ -244,7 +228,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             to { opacity: 1; transform: translateY(0); }
         }
 
-
+        #timer { 
             font-size: 24px; 
             font-weight: 700;
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
@@ -255,12 +239,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             transition: all 0.3s ease;
         }
 
-
+        #timer:hover {
             animation: pulse 1s ease-in-out infinite;
             transform: scale(1.1);
         }
 
-
+        #player-label { 
             font-size: 14px; 
             color: #a3b1d9;
             background: rgba(163, 177, 217, 0.1);
@@ -270,13 +254,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             transition: all 0.3s ease;
         }
 
-
+        #player-label:hover {
             background: rgba(163, 177, 217, 0.2);
             border-color: rgba(163, 177, 217, 0.4);
             transform: scale(1.05);
         }
 
-
+        #game-canvas { 
             display: block; 
             margin: 0 auto; 
             background: #0f172a; 
@@ -290,7 +274,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             transition: all 0.3s ease;
         }
 
-
+        #game-canvas:hover {
             border-color: #3b82f6;
             box-shadow: 0 12px 40px rgba(59, 130, 246, 0.3);
         }
@@ -487,7 +471,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }
 
         /* Critical fix for leaderboard positioning on all devices - top of screen on mobile */
-
+        #leaderboard-screen.active {
             position: relative !important;
             top: 0 !important;
             left: 0 !important;
@@ -506,14 +490,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         
         /* Force mobile leaderboard to stay at top - highest priority */
         @media (max-width: 768px) {
-
+            #leaderboard-screen.active {
                 align-items: flex-start !important;
                 justify-content: flex-start !important;
                 padding-top: 16px !important;
             }
             
             /* Ensure the card itself doesn't get centered */
-
+            #leaderboard-screen.active .card {
                 align-self: flex-start !important;
                 margin-top: 0 !important;
             }
@@ -521,7 +505,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         
         /* Force mobile leaderboard to stay at top and visible */
         @media (max-width: 768px) {
-
+            #leaderboard-screen.active {
                 position: fixed !important;
                 top: 0 !important;
                 left: 0 !important;
@@ -533,7 +517,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             }
         }
 
-
+        #leaderboard-screen.active .card {
             position: relative !important;
             top: auto !important;
             left: auto !important;
@@ -549,7 +533,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         
         /* Ensure mobile leaderboard card stays visible and properly positioned */
         @media (max-width: 768px) {
-
+            #leaderboard-screen.active .card {
                 position: relative !important;
                 top: auto !important;
                 left: auto !important;
@@ -598,13 +582,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             text-align: center;
         }
 
-
+        #canvas-container {
             position: relative;
             display: inline-block;
             margin: 0 auto;
         }
 
-
+        #maze-building-overlay .progress-container {
             width: 200px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
@@ -612,7 +596,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             overflow: hidden;
         }
 
-
+        #maze-building-overlay .progress-bar {
             height: 8px;
             background: linear-gradient(90deg, #3b82f6, #1d4ed8);
             border-radius: 6px;
@@ -659,7 +643,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             background: rgba(59, 130, 246, 0.8);
         }
 
-
+        #leaderboard-loading { 
             align-self: center; 
             margin: 16px 0;
         }
@@ -765,12 +749,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 width: 100% !important;
             }
             
-
+            #app {
                 height: 100vh !important;
                 overflow: hidden !important;
             }
             
-
+            #leaderboard-screen.active {
                 display: flex !important;
                 align-items: flex-start !important;
                 justify-content: flex-start !important;
@@ -788,7 +772,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 z-index: 100 !important;
             }
             
-
+            #leaderboard-screen.active .card {
                 max-height: 85vh !important;
                 height: auto !important;
                 margin: 0 !important;
@@ -820,7 +804,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 width: 100% !important;
             }
             
-
+            #app {
                 height: 100vh !important;
                 overflow: hidden !important;
             }
@@ -832,7 +816,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             }
             
             /* Mobile game screen layout */
-
+            #game-screen {
                 display: flex !important;
                 flex-direction: column !important;
                 height: 100vh !important;
@@ -855,7 +839,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             }
             
             /* Canvas container for mobile */
-
+            #canvas-container {
                 flex: 1;
                 display: flex;
                 align-items: center;
@@ -864,11 +848,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             }
             
             /* Ensure timer left and player name right on mobile */
-
-
+            #timer { order: 1; }
+            #player-label { order: 2; }
             
             /* Mobile leaderboard fixes - POSITIONED AT TOP */
-
+            #leaderboard-screen {
                 display: flex !important;
                 align-items: flex-start !important;
                 justify-content: center !important;
@@ -886,7 +870,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 z-index: 100 !important;
             }
             
-
+            #leaderboard-screen .card {
                 max-height: 85vh !important;
                 height: auto !important;
                 display: flex !important;
@@ -903,7 +887,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 transform: none !important;
             }
             
-
+            #leaderboard-screen .card h2 {
                 margin-top: 0 !important;
                 margin-bottom: 16px !important;
                 font-size: 22px !important;
@@ -917,12 +901,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 min-height: 200px !important;
             }
             
-
+            #play-again-btn {
                 margin-top: 16px !important;
                 flex-shrink: 0 !important;
             }
             
-
+            #leaderboard-loading {
                 margin: 12px 0 !important;
             }
         }
@@ -930,10 +914,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         @media (hover: hover) and (pointer: fine) {
             /* Desktop: use full viewport and prevent scroll while playing */
             html, body { height: 100%; overflow: hidden; }
-
+            #app { width: 100vw; height: 100vh; }
 
             /* Game screen specific layout for desktop */
-
+            #game-screen.active { 
                 position: fixed !important;
                 top: 0 !important;
                 left: 0 !important;
@@ -960,21 +944,21 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 z-index: 10;
             }
             
-
+            #canvas-container { 
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 position: relative;
             }
             
-
+            #timer, #player-label { pointer-events: auto; }
 
             /* Ensure name left and timer right in HUD */
-
-
+            #player-label { order: 1; }
+            #timer { order: 2; margin-left: auto; }
 
             /* Center all main screens properly on PC */
-
+            #home-screen.active, #leaderboard-screen.active, #loading-screen.active {
                 align-items: center !important;
                 justify-content: center !important;
                 height: 100vh !important;
@@ -990,14 +974,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             }
 
             /* Ensure cards are properly sized on PC */
-
+            #home-screen .card, #loading-screen .card {
                 max-width: 500px !important;
                 width: 100% !important;
                 margin: 0 auto !important;
                 flex-shrink: 0 !important;
             }
             
-
+            #leaderboard-screen .card {
                 max-width: 800px !important;
                 width: 100% !important;
                 max-height: 90vh !important;
@@ -1025,12 +1009,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 width: 100% !important;
             }
             
-
+            #app {
                 height: 100vh !important;
                 overflow: hidden !important;
             }
             
-
+            #home-screen.active, #loading-screen.active {
                 display: grid !important;
                 place-items: center !important;
                 height: 100vh !important;
@@ -1039,7 +1023,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 overflow: hidden !important;
             }
 
-
+            #game-screen.active {
                 display: grid !important;
                 place-items: center !important;
                 height: 100vh !important;
@@ -1048,7 +1032,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             }
 
             /* Special handling for leaderboard to ensure proper mobile positioning at top */
-
+            #leaderboard-screen.active {
                 display: flex !important;
                 align-items: flex-start !important;
                 justify-content: flex-start !important;
@@ -1066,7 +1050,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 z-index: 100 !important;
             }
 
-
+            #leaderboard-screen .card {
                 max-height: 85vh;
                 height: auto;
                 display: flex;
@@ -1205,7 +1189,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <script>
         // Embedded Python game code
         const PYTHON_GAME_CODE = `
-
+# pyright: reportMissingImports=false
 from js import document, window, JSON
 from math import floor
 import random
@@ -1213,7 +1197,7 @@ import time
 import json
 from pyodide.ffi import create_proxy, to_js
 
-
+# ------------------------------ Config ------------------------------
 GRID_SIZE = 20               # cells per side
 CELL_PIXELS = 32             # canvas pixels per cell (640px canvas)
 WALL_THICKNESS = 2
@@ -1222,16 +1206,16 @@ PATH_COLOR = "#0f172a"
 WALL_COLOR = "#334155"
 START_POS = (0, 0)
 EXIT_POS = (GRID_SIZE - 1, GRID_SIZE - 1)
-
+# Toggle for animated vs instant maze generation
 USE_ANIMATED_BUILD = False
 
-
+# Backend API base - use current host and port for standalone version
 def _compute_api_base_url() -> str:
     return f"{window.location.protocol}//{window.location.host}/api"
 
 API_BASE_URL = _compute_api_base_url()
 
-
+# ------------------------------ State ------------------------------
 class GameState:
     def __init__(self) -> None:
         self.player_name: str = ""
@@ -1260,13 +1244,13 @@ leaderboard_table_el = document.getElementById("leaderboard-table")
 maze_building_overlay = document.getElementById("maze-building-overlay")
 maze_progress_bar = document.getElementById("maze-progress")
 
-
+# Screens
 loading_screen = document.getElementById("loading-screen")
 home_screen = document.getElementById("home-screen")
 game_screen = document.getElementById("game-screen")
 leaderboard_screen = document.getElementById("leaderboard-screen")
 
-
+# Buttons
 start_btn = document.getElementById("start-btn")
 home_leaderboard_btn = document.getElementById("home-leaderboard-btn")
 play_again_btn = document.getElementById("play-again-btn")
@@ -1278,13 +1262,13 @@ btn_down = document.getElementById("btn-down")
 btn_left = document.getElementById("btn-left")
 btn_right = document.getElementById("btn-right")
 
-
+# Keep proxies to prevent garbage collection
 _event_proxies = {}
 
-
+# ------------------------------ Utility ------------------------------
 
 def show_screen(screen_id: str) -> None:
-
+    # Smooth transition between screens
     for s in [loading_screen, home_screen, game_screen, leaderboard_screen]:
         if s and s.id == screen_id:
             s.classList.add("active")
@@ -1306,7 +1290,7 @@ def format_time_s(seconds: float) -> str:
 
 
 def show_loading_state(button, loading: bool = True):
-
+    # Show/hide loading state on buttons
     if loading:
         button.classList.add("loading")
         button.disabled = True
@@ -1315,18 +1299,18 @@ def show_loading_state(button, loading: bool = True):
         button.disabled = False
 
 
-
-
-
+# ------------------------------ Maze Generation ------------------------------
+# Maze represented with walls for each cell: dict keyed by (x,y) -> {N,S,E,W: bool}
+# True means wall exists
 
 async def generate_maze_animated(width: int, height: int) -> dict:
-
+    # Generate maze with visual animation
     state.maze_generating = True
     
-
+    # Show maze building overlay
     maze_building_overlay.classList.remove("hidden")
     
-
+    # Initialize all walls
     walls = {}
     for y in range(height):
         for x in range(width):
@@ -1340,10 +1324,10 @@ async def generate_maze_animated(width: int, height: int) -> dict:
     total_cells = width * height
     processed_cells = 1
     
-
+    # Draw initial state
     draw_maze(walls)
     
-
+    # Animation frame counter for smooth updates
     frame_count = 0
     update_frequency = 3  # Update every 3 frames for smooth animation
     
@@ -1358,45 +1342,45 @@ async def generate_maze_animated(width: int, height: int) -> dict:
 
         if unvisited_neighbors:
             nx, ny, direction = random.choice(unvisited_neighbors)
-
+            # carve wall
             walls[(cx, cy)][direction] = False
             walls[(nx, ny)][opposite[direction]] = False
             visited.add((nx, ny))
             stack.append((nx, ny))
             
-
+            # Update progress and redraw
             processed_cells += 1
             progress = (processed_cells / total_cells) * 100
             maze_progress_bar.style.width = f"{progress}%"
             
-
+            # Only redraw every few frames for smooth animation
             frame_count += 1
             if frame_count % update_frequency == 0:
                 draw_maze(walls)
                 
-
+                # Use JavaScript Promise for smooth delay
                 await window.pyodide.runPythonAsync("import asyncio; await asyncio.sleep(0.03)")
         else:
             stack.pop()
     
-
+    # Final render to ensure complete maze
     draw_maze(walls)
     
-
+    # Hide overlay and finish
     maze_building_overlay.classList.add("hidden")
     state.maze_generating = False
     return walls
 
 
 def generate_maze(width: int, height: int) -> dict:
-
+    # Synchronous maze generation (fallback)
     def neighbors(cx: int, cy: int):
         for dx, dy, direction in [(0,-1,'N'), (0,1,'S'), (1,0,'E'), (-1,0,'W')]:
             nx, ny = cx + dx, cy + dy
             if 0 <= nx < width and 0 <= ny < height:
                 yield nx, ny, direction
 
-
+    # Initialize all walls
     walls = {}
     for y in range(height):
         for x in range(width):
@@ -1417,7 +1401,7 @@ def generate_maze(width: int, height: int) -> dict:
 
         if unvisited_neighbors:
             nx, ny, direction = random.choice(unvisited_neighbors)
-
+            # carve wall
             walls[(cx, cy)][direction] = False
             walls[(nx, ny)][opposite[direction]] = False
             visited.add((nx, ny))
@@ -1427,7 +1411,7 @@ def generate_maze(width: int, height: int) -> dict:
 
     return walls
 
-
+# ------------------------------ Rendering ------------------------------
 
 def clear_canvas() -> None:
     if not ctx:
@@ -1443,7 +1427,7 @@ def draw_maze(walls: dict) -> None:
     ctx.strokeStyle = WALL_COLOR
     ctx.lineWidth = WALL_THICKNESS
     
-
+    # Draw walls with smooth animation effect
     for (x, y), w in walls.items():
         px = x * CELL_PIXELS
         py = y * CELL_PIXELS
@@ -1456,7 +1440,7 @@ def draw_maze(walls: dict) -> None:
         if w['E']:
             ctx.beginPath(); ctx.moveTo(px + CELL_PIXELS, py); ctx.lineTo(px + CELL_PIXELS, py + CELL_PIXELS); ctx.stroke()
 
-
+    # draw start & exit with glow effect
     ctx.shadowColor = "#0ea5e9"
     ctx.shadowBlur = 10
     ctx.fillStyle = "#0ea5e9"
@@ -1469,7 +1453,7 @@ def draw_maze(walls: dict) -> None:
     ctx.fillStyle = "#f97316"
     ctx.fillRect(ex * CELL_PIXELS + rectpad, ey * CELL_PIXELS + rectpad, CELL_PIXELS - 2*rectpad, CELL_PIXELS - 2*rectpad)
     
-
+    # Reset shadow
     ctx.shadowBlur = 0
 
 
@@ -1480,16 +1464,16 @@ def draw_player(cell_x: int, cell_y: int) -> None:
     py = cell_y * CELL_PIXELS
     pad = 8
     
-
+    # Add glow effect to player
     ctx.shadowColor = PLAYER_COLOR
     ctx.shadowBlur = 15
     ctx.fillStyle = PLAYER_COLOR
     ctx.fillRect(px + pad, py + pad, CELL_PIXELS - 2*pad, CELL_PIXELS - 2*pad)
     
-
+    # Reset shadow
     ctx.shadowBlur = 0
 
-
+# ------------------------------ Game Logic ------------------------------
 
 def can_move_to(from_x: int, from_y: int, dir_str: str) -> bool:
     w = state.maze_walls[(from_x, from_y)]
@@ -1532,7 +1516,7 @@ def check_win() -> None:
             state.final_time_s = time.time() - state.start_time_s
         final_time_el.innerText = f"Time: {format_time_s(state.final_time_s)}s"
         set_overlay_visible(True)
-
+        # auto submit once
         if not state.submitted:
             window.pyodide.runPythonAsync("await submit_score()")
             state.submitted = True
@@ -1546,7 +1530,7 @@ def render() -> None:
 
 
 async def reset_and_start() -> None:
-
+    # Start new game with animated maze generation
     state.grid_width = GRID_SIZE
     state.grid_height = GRID_SIZE
     state.player_cell = list(START_POS)
@@ -1558,19 +1542,19 @@ async def reset_and_start() -> None:
     timer_el.innerText = "00.00"
     set_overlay_visible(False)
     
-
+    # Generate maze (animated or instant based on flag)
     try:
         if USE_ANIMATED_BUILD:
             state.maze_walls = await generate_maze_animated(state.grid_width, state.grid_height)
         else:
             state.maze_walls = generate_maze(state.grid_width, state.grid_height)
     except Exception:
-
+        # Fallback to synchronous generation if animation fails
         state.maze_walls = generate_maze(state.grid_width, state.grid_height)
     
     render()
 
-
+    # start ticking timer via requestAnimationFrame with persistent proxy
     def _tick(ts):
         if state.finished or state.start_time_s is None:
             return
@@ -1580,7 +1564,7 @@ async def reset_and_start() -> None:
     _event_proxies['tick'] = create_proxy(_tick)
     window.requestAnimationFrame(_event_proxies['tick'])
 
-
+# ------------------------------ Input Handlers ------------------------------
 
 def on_keydown(evt):
     key = evt.key.lower()
@@ -1601,23 +1585,23 @@ async def on_start_click(_e=None):
     state.player_name = (name_input.value or 'Player').strip()
     show_screen('game-screen')
     
-
+    # Show loading state on start button
     if start_btn:
         show_loading_state(start_btn, True)
     
     try:
         await reset_and_start()
     except Exception:
-
+        # Fallback to synchronous version if async fails
         reset_and_start()
     finally:
-
+        # Hide loading state
         if start_btn:
             show_loading_state(start_btn, False)
 
 
 def on_start_click_sync(_e=None):
-
+    # Synchronous fallback for start button
     if _e and hasattr(_e, 'preventDefault'):
         _e.preventDefault()
     name_input = document.getElementById('player-name')
@@ -1627,7 +1611,7 @@ def on_start_click_sync(_e=None):
 
 
 def reset_leaderboard_state():
-
+    # Reset leaderboard to initial state
     if leaderboard_loading_el:
         leaderboard_loading_el.classList.add("hidden")
     if leaderboard_table_el:
@@ -1648,49 +1632,49 @@ async def on_try_again(_e=None):
 
 
 def on_try_again_sync(_e=None):
-
+    # Synchronous fallback for try again button
     set_overlay_visible(False)
     reset_and_start()
 
 async def on_view_leaderboard(_e=None):
-
-
+    # Load leaderboard with loading state
+    # Ensure elements exist before proceeding
     if not leaderboard_loading_el or not leaderboard_table_el:
         print("Leaderboard elements not found")
         show_screen('leaderboard-screen')
         return
     
     print("Showing leaderboard loading state...")
-
+    # Show loading state
     leaderboard_loading_el.classList.remove("hidden")
     leaderboard_table_el.classList.add("hidden")
-
+    # Also toggle inline styles as a safety net
     leaderboard_loading_el.style.display = ""
     leaderboard_table_el.style.display = "none"
     
-
+    # Load the leaderboard data
     await load_leaderboard()
     
     print("Leaderboard loaded, hiding loading state...")
-
+    # Hide loading, show table with a small delay to ensure smooth transition
     await window.pyodide.runPythonAsync("import asyncio; await asyncio.sleep(0.1)")
     
-
+    # Hide loading, show table
     leaderboard_loading_el.classList.add("hidden")
     leaderboard_table_el.classList.remove("hidden")
-
+    # Also toggle inline styles as a safety net
     leaderboard_loading_el.style.display = "none"
     leaderboard_table_el.style.display = ""
     print("Loading state hidden, table shown")
     
     show_screen('leaderboard-screen')
 
-
+# ------------------------------ Leaderboard ------------------------------
 async def submit_score(_e=None):
     if _e and hasattr(_e, 'preventDefault'):
         _e.preventDefault()
     
-
+    # Show loading state on submit button if available
     if view_leaderboard_btn:
         show_loading_state(view_leaderboard_btn, True)
     
@@ -1703,15 +1687,15 @@ async def submit_score(_e=None):
     
     try:
         resp = await window.fetch(url, opts_js)
-
+        # regardless of result, we don't block UI; leaderboard load happens when requested
     finally:
-
+        # Hide loading state
         if view_leaderboard_btn:
             show_loading_state(view_leaderboard_btn, False)
 
 async def load_leaderboard():
-
-
+    # Load leaderboard data with proper error handling
+    # Clear previous data
     if leaderboard_body_el:
         leaderboard_body_el.innerHTML = ""
     
@@ -1726,7 +1710,7 @@ async def load_leaderboard():
     try:
         ok, raw = await _try_fetch_once()
         if not ok:
-
+            # Retry once after brief delay (handles transient reloads)
             await window.pyodide.runPythonAsync("import asyncio; await asyncio.sleep(0.2)")
             ok, raw = await _try_fetch_once()
             if not ok:
@@ -1734,7 +1718,7 @@ async def load_leaderboard():
                 if leaderboard_body_el:
                     leaderboard_body_el.innerHTML = "<tr><td colspan=3>Error loading leaderboard.</td></tr>"
                 return
-
+        # Parse JSON
         data = json.loads(raw)
     except Exception as e:
         print(f"Error loading leaderboard: {e}")
@@ -1747,25 +1731,25 @@ async def load_leaderboard():
             leaderboard_body_el.innerHTML = "<tr><td colspan=3>No scores yet.</td></tr>"
         return
     
-
+    # Build the leaderboard rows
     rows_html = []
     for idx, item in enumerate(data, start=1):
-
+        # item may be JS object or dict after JSON parse; use .get defensively
         try:
             name = item.get('name', 'Player')
             time_val = float(item.get('time', 9999))
         except Exception:
-
+            # Fallback if item is not a dict-like
             name = str(item['name']) if 'name' in item else 'Player'
             time_val = float(item['time']) if 'time' in item else 9999.0
         rows_html.append(f"<tr><td>{idx}</td><td>{name}</td><td>{time_val:.2f}</td></tr>")
     
-
+    # Update the table
     if leaderboard_body_el:
         leaderboard_body_el.innerHTML = "".join(rows_html)
 
 def initialize_leaderboard_state():
-
+    # Initialize leaderboard to default state
     if leaderboard_loading_el:
         leaderboard_loading_el.classList.add("hidden")
     if leaderboard_table_el:
@@ -1774,13 +1758,13 @@ def initialize_leaderboard_state():
         leaderboard_body_el.innerHTML = ""
 
 
-
+# ------------------------------ Init ------------------------------
 
 def bind_controls():
-
+    # Keyboard
     _event_proxies['keydown'] = create_proxy(on_keydown)
     window.addEventListener('keydown', _event_proxies['keydown'])
-
+    # Clicks (fallback if app loaded before JS boot)
     if btn_up: _event_proxies['btn_up'] = create_proxy(lambda e: try_move('N')); btn_up.addEventListener('click', _event_proxies['btn_up'])
     if btn_down: _event_proxies['btn_down'] = create_proxy(lambda e: try_move('S')); btn_down.addEventListener('click', _event_proxies['btn_down'])
     if btn_left: _event_proxies['btn_left'] = create_proxy(lambda e: try_move('W')); btn_left.addEventListener('click', _event_proxies['btn_left'])
@@ -1805,13 +1789,14 @@ def bind_ui():
         try_again_btn.addEventListener('click', _event_proxies['try_again'])
     bind_controls()
     
-
+    # Initialize leaderboard state
     initialize_leaderboard_state()
 
 bind_ui()
 show_screen('home-screen')
 `;
 
+        // Enhanced loading with better error handling
         (async () => {
             const progressBar = document.getElementById('loading-progress');
             const loadingScreen = document.getElementById('loading-screen');
@@ -1823,6 +1808,7 @@ show_screen('home-screen')
             try {
                 console.log('Starting Pyodide initialization...');
                 
+                // Start progress simulation
                 progressInterval = setInterval(() => {
                     progress += Math.random() * 5; // Slower progress for real loading
                     if (progress >= 90) progress = 90; // Cap at 90% until actually loaded
@@ -1887,13 +1873,10 @@ show_screen('home-screen')
 </html>"""
 
 
-
 def get_leaderboard_scores() -> List[Dict[str, Any]]:
     """Get best scores from database"""
     conn = sqlite3.connect(DATABASE_FILE)
     cursor = conn.cursor()
-    
-
     cursor.execute('''
         SELECT name, MIN(time) as best_time 
         FROM scores 
@@ -1904,8 +1887,6 @@ def get_leaderboard_scores() -> List[Dict[str, Any]]:
     
     results = cursor.fetchall()
     conn.close()
-    
-
     scores = []
     for name, time_val in results:
         scores.append({
@@ -1932,8 +1913,6 @@ def save_score(name: str, time_val: float) -> bool:
     except Exception as e:
         print(f"Error saving score: {e}")
         return False
-
-
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_game():
@@ -1963,11 +1942,8 @@ async def get_leaderboard() -> JSONResponse:
         print(f"Error getting leaderboard: {exc}")
         raise HTTPException(status_code=500, detail=str(exc))
 
-
-
 def main():
     """Run the standalone maze game server"""
-
     import os
     port = int(os.environ.get("PORT", PORT))
     host = os.environ.get("HOST", HOST)
