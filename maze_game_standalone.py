@@ -185,6 +185,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             transform: translateY(-2px) translateZ(0);
             box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
         }
+        
+        button[style*="background: #059669"]:hover,
+        button[style*="background: #059669"]:hover {
+            background: #047857 !important; /* Darker green on hover */
+            border-color: #047857 !important;
+            box-shadow: 0 8px 20px rgba(4, 120, 87, 0.4) !important;
+        }
         button:active { 
             transform: translateY(0) translateZ(0);
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
