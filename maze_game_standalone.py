@@ -197,6 +197,159 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
 
+        /* Color picker styles */
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .color-option.selected {
+            border-color: #ffffff;
+            box-shadow: 0 0 0 3px #3b82f6, 0 4px 16px rgba(0, 0, 0, 0.4);
+            transform: scale(1.15);
+        }
+
+        .color-option.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Mobile color picker adjustments */
+        @media (max-width: 768px) {
+            .color-option {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .color-option.selected::after {
+                font-size: 14px;
+            }
+        }
+
+        /* Shape picker styles */
+        .shape-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shape-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            border-color: rgba(59, 130, 246, 0.5);
+            background: #4b5563;
+        }
+
+        .shape-option.selected {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4);
+            transform: scale(1.15);
+        }
+
+        .shape-preview {
+            width: 24px;
+            height: 24px;
+            background: #e9eef7;
+            border-radius: 2px;
+        }
+
+        .shape-preview.circle {
+            border-radius: 50%;
+        }
+
+        .shape-preview.star {
+            background: transparent;
+            color: #e9eef7;
+            font-size: 20px;
+            line-height: 24px;
+            text-align: center;
+        }
+
+        .shape-preview.diamond {
+            transform: rotate(45deg);
+        }
+
+        .shape-preview.triangle {
+            background: transparent;
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-bottom: 20px solid #e9eef7;
+        }
+
+        .shape-preview.square {
+            border-radius: 0;
+        }
+
+        .shape-preview.rose {
+            background: transparent;
+            color: #e9eef7;
+            font-size: 20px;
+            line-height: 24px;
+            text-align: center;
+        }
+
+
+
+        /* Mobile shape picker adjustments */
+        @media (max-width: 768px) {
+            .shape-option {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .shape-preview {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .shape-preview.star {
+                font-size: 16px;
+                line-height: 20px;
+            }
+            
+            .shape-preview.triangle {
+                border-left-width: 10px;
+                border-right-width: 10px;
+                border-bottom-width: 16px;
+            }
+            
+            .shape-preview.rose {
+                font-size: 16px;
+                line-height: 20px;
+            }
+
+        }
+
         /* Loading button state */
         button.loading {
             pointer-events: none;
@@ -1098,6 +1251,42 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 <h1>Maze Runner</h1>
                 <label for="player-name">Enter your name</label>
                 <input id="player-name" type="text" placeholder="Player" />
+                
+                <label for="player-color" style="margin-top: 16px;">Choose your color</label>
+                <div style="display: flex; gap: 8px; margin-top: 8px; justify-content: center; flex-wrap: wrap;">
+                    <div class="color-option" data-color="#22c55e" style="background: #22c55e;"></div>
+                    <div class="color-option" data-color="#3b82f6" style="background: #3b82f6;"></div>
+                    <div class="color-option" data-color="#f97316" style="background: #f97316;"></div>
+                    <div class="color-option" data-color="#8b5cf6" style="background: #8b5cf6;"></div>
+                    <div class="color-option" data-color="#ec4899" style="background: #ec4899;"></div>
+                    <div class="color-option" data-color="#f59e0b" style="background: #f59e0b;"></div>
+                    <div class="color-option" data-color="#10b981" style="background: #10b981;"></div>
+                    <div class="color-option" data-color="#ef4444" style="background: #ef4444;"></div>
+                    </div>
+                    
+                <label for="player-shape" style="margin-top: 16px;">Choose your shape</label>
+                <div style="display: flex; gap: 8px; margin-top: 8px; justify-content: center; flex-wrap: wrap;">
+                    <div class="shape-option" data-shape="circle" style="background: #374151;">
+                        <div class="shape-preview circle"></div>
+                        </div>
+                    <div class="shape-option" data-shape="star" style="background: #374151;">
+                        <div class="shape-preview star">★</div>
+                    </div>
+                    <div class="shape-option" data-shape="diamond" style="background: #374151;">
+                        <div class="shape-preview diamond"></div>
+                    </div>
+                    <div class="shape-option" data-shape="triangle" style="background: #374151;">
+                        <div class="shape-preview triangle"></div>
+                        </div>
+                    <div class="shape-option" data-shape="square" style="background: #374151;">
+                        <div class="shape-preview square"></div>
+                    </div>
+                    <div class="shape-option" data-shape="rose" style="background: #374151;">
+                        <div class="shape-preview rose">✿</div>
+                    </div>
+                    
+                </div>
+                
                 <div style="display: flex; gap: 12px; margin-top: 16px;">
                     <button id="start-btn" style="flex: 1;">Start Game</button>
                     <button id="home-leaderboard-btn" style="flex: 1; background: #059669; border-color: #059669;">View Leaderboard</button>
@@ -1187,8 +1376,107 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             }
         }
         
+        // Color picker functionality
+        function initializeColorPicker() {
+            const colorOptions = document.querySelectorAll('.color-option');
+            const defaultColor = '#22c55e';
+            
+            // Set default color as selected
+            document.querySelector(`[data-color="${defaultColor}"]`).classList.add('selected');
+            
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selection from all options
+                    colorOptions.forEach(opt => opt.classList.remove('selected'));
+                    // Add selection to clicked option
+                    this.classList.add('selected');
+                    
+                    // Update the color preview in the player name input if it has a value
+                    const nameInput = document.getElementById('player-name');
+                    if (nameInput && nameInput.value.trim()) {
+                        updatePlayerPreview();
+                    }
+                });
+            });
+        }
+        
+        // Shape picker functionality
+        function initializeShapePicker() {
+            const shapeOptions = document.querySelectorAll('.shape-option');
+            const defaultShape = 'circle';
+            
+            // Set default shape as selected
+            document.querySelector(`[data-shape="${defaultShape}"]`).classList.add('selected');
+            
+            shapeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selection from all options
+                    shapeOptions.forEach(opt => opt.classList.remove('selected'));
+                    // Add selection to clicked option
+                    this.classList.add('selected');
+                    
+                    // Update the player preview if name input has a value
+                    const nameInput = document.getElementById('player-name');
+                    if (nameInput && nameInput.value.trim()) {
+                        updatePlayerPreview();
+                    }
+                });
+            });
+        }
+        
+        // Update player preview with selected color and shape
+        function updatePlayerPreview() {
+            const nameInput = document.getElementById('player-name');
+            const selectedColor = getSelectedColor();
+            const selectedShape = getSelectedShape();
+            const playerName = nameInput.value.trim() || 'Player';
+            
+            // Add a small preview next to the input
+            let previewElement = document.getElementById('player-preview');
+            if (!previewElement) {
+                previewElement = document.createElement('div');
+                previewElement.id = 'player-preview';
+                previewElement.style.cssText = 'margin-top: 8px; font-size: 14px; color: #94a3b8; text-align: center;';
+                nameInput.parentNode.insertBefore(previewElement, nameInput.nextSibling);
+            }
+            
+            // Create shape symbol based on selection
+            let shapeSymbol = '●'; // default circle
+            if (selectedShape === 'star') shapeSymbol = '★';
+            else if (selectedShape === 'diamond') shapeSymbol = '◆';
+            else if (selectedShape === 'triangle') shapeSymbol = '▲';
+            else if (selectedShape === 'square') shapeSymbol = '■';
+            else if (selectedShape === 'rose') shapeSymbol = '✿';
+            
+            previewElement.innerHTML = `<span style="color: ${selectedColor};">${shapeSymbol}</span> ${playerName}`;
+        }
+        
+        // Get selected color
+        function getSelectedColor() {
+            const selectedOption = document.querySelector('.color-option.selected');
+            return selectedOption ? selectedOption.dataset.color : '#22c55e';
+        }
+        
+        // Get selected shape
+        function getSelectedShape() {
+            const selectedOption = document.querySelector('.shape-option.selected');
+            return selectedOption ? selectedOption.dataset.shape : 'circle';
+        }
+        
         // Run mobile detection
         detectMobile();
+        
+        // Initialize color picker
+        initializeColorPicker();
+        
+        // Initialize shape picker
+        initializeShapePicker();
+        
+        // Add name input listener for live preview
+        const nameInput = document.getElementById('player-name');
+        if (nameInput) {
+            nameInput.addEventListener('input', updatePlayerPreview);
+        }
         
         // Re-run on resize
         window.addEventListener('resize', detectMobile);
@@ -1208,7 +1496,7 @@ from pyodide.ffi import create_proxy, to_js
 GRID_SIZE = 20               # cells per side
 CELL_PIXELS = 32             # canvas pixels per cell (640px canvas)
 WALL_THICKNESS = 2
-PLAYER_COLOR = "#22c55e"
+DEFAULT_PLAYER_COLOR = "#22c55e"  # Default color, can be changed
 PATH_COLOR = "#0f172a"
 WALL_COLOR = "#334155"
 START_POS = (0, 0)
@@ -1226,6 +1514,8 @@ API_BASE_URL = _compute_api_base_url()
 class GameState:
     def __init__(self) -> None:
         self.player_name: str = ""
+        self.player_color: str = DEFAULT_PLAYER_COLOR  # Player's chosen color
+        self.player_shape: str = "circle"  # Player's chosen shape
         self.grid_width: int = GRID_SIZE
         self.grid_height: int = GRID_SIZE
         self.maze_walls = None  # dict with walls per cell
@@ -1294,6 +1584,9 @@ def set_overlay_visible(visible: bool) -> None:
 
 def format_time_s(seconds: float) -> str:
     return f"{seconds:.2f}"
+
+
+
 
 
 def show_loading_state(button, loading: bool = True):
@@ -1467,15 +1760,97 @@ def draw_maze(walls: dict) -> None:
 def draw_player(cell_x: int, cell_y: int) -> None:
     if not ctx:
         return
+    
     px = cell_x * CELL_PIXELS
     py = cell_y * CELL_PIXELS
     pad = 8
+    size = CELL_PIXELS - 2*pad
+    center_x = px + CELL_PIXELS // 2
+    center_y = py + CELL_PIXELS // 2
     
-    # Add glow effect to player
-    ctx.shadowColor = PLAYER_COLOR
+    # Add glow effect to player using selected color
+    ctx.shadowColor = state.player_color
     ctx.shadowBlur = 15
-    ctx.fillStyle = PLAYER_COLOR
-    ctx.fillRect(px + pad, py + pad, CELL_PIXELS - 2*pad, CELL_PIXELS - 2*pad)
+    ctx.fillStyle = state.player_color
+    
+    # Draw different shapes based on player selection
+    if state.player_shape == "circle":
+        ctx.beginPath()
+        ctx.arc(center_x, center_y, size // 2, 0, 2 * 3.14159)
+        ctx.fill()
+    
+    elif state.player_shape == "star":
+        # Draw a star using multiple triangles
+        ctx.save()
+        ctx.translate(center_x, center_y)
+        ctx.rotate(3.14159 / 2)  # Rotate 90 degrees
+        
+        # Draw 5-pointed star
+        for i in range(5):
+            ctx.rotate(2 * 3.14159 / 5)
+            ctx.beginPath()
+            ctx.moveTo(0, -size // 2)
+            ctx.lineTo(size // 8, -size // 4)
+            ctx.lineTo(size // 2, -size // 4)
+            ctx.lineTo(size // 4, 0)
+            ctx.lineTo(size // 2, size // 4)
+            ctx.lineTo(size // 8, size // 4)
+            ctx.closePath()
+            ctx.fill()
+        ctx.restore()
+    
+    elif state.player_shape == "diamond":
+        ctx.beginPath()
+        ctx.moveTo(center_x, py + pad)
+        ctx.lineTo(px + CELL_PIXELS - pad, center_y)
+        ctx.lineTo(center_x, py + CELL_PIXELS - pad)
+        ctx.lineTo(px + pad, center_y)
+        ctx.closePath()
+        ctx.fill()
+    
+    elif state.player_shape == "triangle":
+        ctx.beginPath()
+        ctx.moveTo(center_x, py + pad)
+        ctx.lineTo(px + pad, py + CELL_PIXELS - pad)
+        ctx.lineTo(px + CELL_PIXELS - pad, py + CELL_PIXELS - pad)
+        ctx.closePath()
+        ctx.fill()
+    
+    elif state.player_shape == "square":
+        ctx.fillRect(px + pad, py + pad, size, size)
+    
+    elif state.player_shape == "rose":
+        # Draw a beautiful rose using petals
+        ctx.save()
+        ctx.translate(center_x, center_y)
+        
+        # Draw multiple layers of petals for a realistic rose
+        for layer in range(3):
+            petal_count = 8 - layer * 2  # More petals in outer layers
+            petal_size = size // 2 - layer * 4
+            
+            for i in range(petal_count):
+                ctx.rotate(2 * 3.14159 / petal_count)
+                ctx.fillStyle = state.player_color
+                
+                # Draw petal shape using ellipse
+                ctx.beginPath()
+                ctx.ellipse(0, -petal_size // 2, petal_size // 3, petal_size // 2, 0, 0, 2 * 3.14159)
+                ctx.fill()
+    
+        # Draw center
+        ctx.fillStyle = state.player_color
+        ctx.beginPath()
+        ctx.arc(0, 0, size // 8, 0, 2 * 3.14159)
+        ctx.fill()
+        
+        ctx.restore()
+    
+    else:
+        # Fallback to circle
+        ctx.beginPath()
+        ctx.arc(center_x, center_y, size // 2, 0, 2 * 3.14159)
+        ctx.fill()
     
     # Reset shadow
     ctx.shadowBlur = 0
@@ -1545,7 +1920,17 @@ async def reset_and_start() -> None:
     state.finished = False
     state.final_time_s = 0.0
     state.submitted = False
-    player_label_el.innerText = f"Player: {state.player_name}"
+    
+    # Preserve player color and shape when resetting
+    if not state.player_color:
+        state.player_color = DEFAULT_PLAYER_COLOR
+    if not state.player_shape:
+        state.player_shape = "circle"
+    
+    # Create colored player label with selected color and shape
+    shape_symbols = {"circle": "●", "star": "★", "diamond": "◆", "triangle": "▲", "square": "■", "rose": "✿"}
+    shape_symbol = shape_symbols.get(state.player_shape, "●")
+    player_label_el.innerHTML = f'<span style="color: {state.player_color};">{shape_symbol}</span> {state.player_name}'
     timer_el.innerText = "00.00"
     set_overlay_visible(False)
     
@@ -1590,6 +1975,18 @@ async def on_start_click(_e=None):
         _e.preventDefault()
     name_input = document.getElementById('player-name')
     state.player_name = (name_input.value or 'Player').strip()
+    
+    # Get selected color and shape from JavaScript
+    try:
+        selected_color = window.getSelectedColor()
+        state.player_color = selected_color
+        selected_shape = window.getSelectedShape()
+        state.player_shape = selected_shape
+    except Exception:
+        # Fallback to defaults if JavaScript fails
+        state.player_color = DEFAULT_PLAYER_COLOR
+        state.player_shape = "circle"
+    
     show_screen('game-screen')
     
     # Show loading state on start button
@@ -1613,6 +2010,18 @@ def on_start_click_sync(_e=None):
         _e.preventDefault()
     name_input = document.getElementById('player-name')
     state.player_name = (name_input.value or 'Player').strip()
+    
+    # Get selected color and shape from JavaScript
+    try:
+        selected_color = window.getSelectedColor()
+        state.player_color = selected_color
+        selected_shape = window.getSelectedShape()
+        state.player_shape = selected_shape
+    except Exception:
+        # Fallback to defaults if JavaScript fails
+        state.player_color = DEFAULT_PLAYER_COLOR
+        state.player_shape = "circle"
+    
     show_screen('game-screen')
     reset_and_start()
 
