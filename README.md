@@ -1,12 +1,12 @@
 # 🎮 Maze Runner - Procedural Maze Game
 
-**Play the game now: [https://web-production-7aa99.up.railway.app/](https://web-production-7aa99.up.railway.app/)**
+**Play the game now: [https://web-production-4e66.up.railway.app/](https://web-production-4e66.up.railway.app/)**
 
 A procedurally generated maze game where you navigate through unique mazes to reach the exit as quickly as possible. Every maze is different, ensuring a fresh challenge every time you play!
 
 ## 🎯 Play Now!
 
-**[🎮 Click here to play Maze Runner](https://web-production-7aa99.up.railway.app/)**
+**[🎮 Click here to play Maze Runner](https://web-production-4e66.up.railway.app/)**
 
 No installation required - just open the link and start playing in your browser!
 
@@ -102,6 +102,6 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-**Ready to play? [Click here to start your maze adventure!](https://web-production-7aa99.up.railway.app/) 🎮✨**
+**Ready to play? [Click here to start your maze adventure!](https://web-production-4e66.up.railway.app/) 🎮✨**
 
 *For questions or support, please open an issue on GitHub.*
